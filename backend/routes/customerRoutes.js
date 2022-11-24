@@ -4,7 +4,7 @@ const {
     updateCustomer,
     getCustomers,
     deleteCustomer,
-} = require("../controllers/cutomerController");
+} = require("../controllers/customerController");
 const { adminProtect } = require("../middleware/adminAuthMiddleware");
 
 // Customers

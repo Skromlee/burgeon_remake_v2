@@ -13,3 +13,5 @@ router.post("/employees", adminProtect, registerEmployee);
 router.post("/employees/:id", adminProtect, updateEmployee);
 router.get("/employees", adminProtect, getEmployees);
 router.delete("/employees/:id", adminProtect, deleteEmployee);
+
+module.exports = router;
