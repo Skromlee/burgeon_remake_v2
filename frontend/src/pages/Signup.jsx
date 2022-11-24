@@ -17,6 +17,7 @@ import {
 
 const Signup = () => {
     const onSubmit = async (valuse, actions) => {
+        console.log(valuse);
         await new Promise((resolve) => setTimeout(resolve, 1000));
         actions.resetForm();
     };
@@ -33,6 +34,8 @@ const Signup = () => {
         validationSchema: signUpSchema,
         onSubmit,
     });
+
+    console.log(formik.errors);
 
     return (
         <>
@@ -149,7 +152,7 @@ const Signup = () => {
 
                             <FormControl
                                 required
-                                error={formik.errors.acceptedTos}
+                                error={formik.errors.acceptedTos ? true : false}
                                 component="fieldset"
                             >
                                 <FormGroup>
