@@ -6,70 +6,42 @@ const User = require("../models/userModel");
 // @desc Register new user
 // @route POST /api/users
 // @access Public
-const registerUser = asyncHandler(async (req, res) => {
-    const {
-        email,
-        password,
-        firstname,
-        lastname,
-        phone,
-        citizen,
-        addressNo,
-        province,
-        district,
-        subdistrict,
-        postcode,
-        dob,
-    } = req.body;
+const userSignup = asyncHandler(async (req, res) => {
+    console.log(req.body);
+    const { email, confirmemail, password, confirmpassword, citizen } =
+        req.body;
 
-    if (!email && !password) {
+    if (!email || !confirmemail || !password || !confirmpassword || !citizen) {
         res.status(400);
-        throw new Error("Please add all required fields");
+        throw new Error(
+            "Please make sure you already added all required fields"
+        );
     }
-
     //Check if user exists
-    const userExists = await User.findOne({ email });
-    const userExists2 = await User.findOne({ citizen });
-
-    if (userExists || userExists2) {
+    const userExistsByEmail = await User.findOne({ email });
+    const userExistsByCitizen = await User.findOne({ citizen });
+    if (userExistsByEmail) {
         res.status(400);
-        throw new Error("User already exists");
+        throw new Error("User already exists by email.");
     }
-
+    if (userExistsByCitizen) {
+        res.status(400);
+        throw new Error("User already exists by Licence ID Number.");
+    }
     // Hash password goes here
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-
     // Create user
     const user = await User.create({
         email,
         password: hashedPassword,
-        firstname,
-        lastname,
-        phone,
         citizen,
-        addressNo,
-        province,
-        district,
-        subdistrict,
-        postcode,
-        dob,
     });
-
     if (user) {
         res.status(201).json({
-            _id: user.id,
-            firstname: user.firstname,
-            lastname: user.lastname,
+            id: user.id,
             email: user.email,
-            phone: user.phone,
             citizen: user.citizen,
-            addressNo: user.addressNo,
-            province: user.province,
-            district: user.district,
-            subdistrict: user.subdistrict,
-            postcode: user.postcode,
-            dob: user.dob,
             token: generateToken(user._id),
         });
     } else {
@@ -177,7 +149,7 @@ const generateToken = (id) => {
 };
 
 module.exports = {
-    registerUser,
+    userSignup,
     loginUser,
     updateUser,
     getUserDetails,

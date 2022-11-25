@@ -1,20 +1,45 @@
 import { useFormik } from "formik";
 import { signInSchema } from "../../schemas";
+import { useEffect } from "react";
+// react-toastify
+import { toast } from "react-toastify";
 // icons from react-icons
 import { AiOutlineClose } from "react-icons/ai";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 // material ui
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
+// adminSlice
+import { adminSignin, reset } from "../../features/auth/authSlice";
+import { Backdrop, CircularProgress } from "@mui/material";
 
 const AdminSignIn = () => {
     // Dispatch and Navigate
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const onSubmit = async (valuse, actions) => {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+    const { admin, isLoading, isError, isSuccess, message } = useSelector(
+        (state) => state.auth
+    );
+
+    useEffect(() => {
+        if (isError) {
+            toast.error(message);
+        }
+
+        if (isSuccess || admin) {
+            navigate("/admin/home");
+        }
+
+        return () => {
+            dispatch(reset());
+        };
+    }, [admin, isError, isSuccess, message, navigate, dispatch]);
+
+    const onSubmit = async (values, actions) => {
+        // Admin SignIn Dispatch
+        dispatch(adminSignin(values));
         actions.resetForm();
     };
 
@@ -26,6 +51,20 @@ const AdminSignIn = () => {
         validationSchema: signInSchema,
         onSubmit,
     });
+
+    if (isLoading) {
+        return (
+            <Backdrop
+                sx={{
+                    color: "#fff",
+                    zIndex: (theme) => theme.zIndex.drawer + 1,
+                }}
+                open={true}
+            >
+                <CircularProgress color="inherit" />
+            </Backdrop>
+        );
+    }
 
     return (
         <>
@@ -95,6 +134,9 @@ const AdminSignIn = () => {
                                 type="submit"
                                 fullWidth
                                 variant="contained"
+                                className={
+                                    isLoading ? "opacity-30 transition" : null
+                                }
                             >
                                 Sign In
                             </Button>

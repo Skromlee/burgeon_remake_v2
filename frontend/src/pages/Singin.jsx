@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 // material ui
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
+// userSlice
+import { reset } from "../features/auth/authSlice";
 
 const Signup = () => {
     // Dispatch and Navigate
@@ -15,6 +17,7 @@ const Signup = () => {
 
     const onSubmit = async (valuse, actions) => {
         await new Promise((resolve) => setTimeout(resolve, 1000));
+        // Dispatch to userSignIn
         actions.resetForm();
     };
 

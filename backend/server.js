@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use("/api/users", require("./routes/userRoutes"));
-app.use("/api/admin", require("./routes/adminRoutes"));
+app.use("/api/admins", require("./routes/adminRoutes"));
 app.use("/api/parcels", require("./routes/parcelRoutes"));
 app.use("/api/branch", require("./routes/branchRoutes"));
 app.use("/api/groups", require("./routes/groupRoutes"));

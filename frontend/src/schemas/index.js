@@ -78,7 +78,7 @@ export const signUpSchema = yup.object().shape({
                 let check = (11 - mod) % 10;
                 // STEP 6 - if check is match the digit 13th is correct
                 if (check == parseInt(id.charAt(12))) {
-                    console.log("Valid ID");
+                    // console.log("Valid ID");
                     return true;
                 }
                 return false;

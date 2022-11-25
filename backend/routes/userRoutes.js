@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const {
-    registerUser,
+    userSignup,
     loginUser,
     updateUser,
     getUserDetails,
@@ -12,7 +12,7 @@ const { protect } = require("../middleware/authMiddleware");
 
 // Protect Middleware goes here
 
-router.post("/", registerUser);
+router.post("/", userSignup);
 router.post("/login", loginUser);
 router.put("/:id", protect, updateUser);
 router.get("/", protect, getUserDetails);

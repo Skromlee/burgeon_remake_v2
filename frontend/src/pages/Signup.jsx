@@ -1,24 +1,54 @@
+// react-toastify
+import { toast } from "react-toastify";
+// formik
 import { useFormik } from "formik";
 import { signUpSchema } from "../schemas";
 // icons from react-icons
 import { AiOutlineClose } from "react-icons/ai";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 // material ui
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
+// userSlice
+import { reset, userSignup } from "../features/auth/authSlice";
 import {
+    Backdrop,
     Checkbox,
+    CircularProgress,
     FormControl,
     FormControlLabel,
     FormGroup,
     FormHelperText,
 } from "@mui/material";
+import { useEffect } from "react";
 
 const Signup = () => {
-    const onSubmit = async (valuse, actions) => {
-        console.log(valuse);
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+    // navigate and dispatch
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const { user, isLoading, isError, isSuccess, message } = useSelector(
+        (state) => state.auth
+    );
+
+    useEffect(() => {
+        if (isError) {
+            toast.error(message);
+        }
+
+        if (isSuccess || user) {
+            navigate("/user/home");
+        }
+
+        return () => {
+            dispatch(reset());
+        };
+    }, [user, isError, isSuccess, message, navigate, dispatch]);
+
+    const onSubmit = (values, actions) => {
+        // Dispatch to userSignup
+        dispatch(userSignup(values));
         actions.resetForm();
     };
 
@@ -35,7 +65,19 @@ const Signup = () => {
         onSubmit,
     });
 
-    console.log(formik.errors);
+    if (isLoading) {
+        return (
+            <Backdrop
+                sx={{
+                    color: "#fff",
+                    zIndex: (theme) => theme.zIndex.drawer + 1,
+                }}
+                open={true}
+            >
+                <CircularProgress color="inherit" />
+            </Backdrop>
+        );
+    }
 
     return (
         <>

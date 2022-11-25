@@ -83,25 +83,24 @@ const registerAdmin = asyncHandler(async (req, res) => {
 });
 
 // @desc Authenticate a admin
-// @route POST /api/admin/login
+// @route POST /api/admins/login
 // @access Public
-const loginAdmin = asyncHandler(async (req, res) => {
-    // req.body;
+const adminSignin = asyncHandler(async (req, res) => {
+    // // req.body;
     const { email, password } = req.body;
-    // const admin = await Admin.findOne({ email });
+    // // const admin = await Admin.findOne({ email });
     const employee = await Employee.findOne({ email });
 
     if (employee && (await bcrypt.compare(password, employee.password))) {
         res.json({
-            _id: employee.id,
-            // fullname: user.firstname + " " + user.lastname,
+            id: employee.id,
             email: employee.email,
             role: employee.role,
             token: generateToken(employee._id),
         });
     } else {
         res.status(400);
-        throw new Error("Invalid credentails");
+        throw new Error("Incorrect email address or password");
     }
 });
 
@@ -139,7 +138,7 @@ const generateToken = (id) => {
 
 module.exports = {
     registerAdmin,
-    loginAdmin,
+    adminSignin,
     // getMe,
     // updateUser,
 };
