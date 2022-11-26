@@ -39,10 +39,19 @@ const userSignup = asyncHandler(async (req, res) => {
     });
     if (user) {
         res.status(201).json({
-            id: user.id,
+            _id: user.id,
             email: user.email,
             citizen: user.citizen,
             token: generateToken(user._id),
+            firstname: user.firstname,
+            lastname: user.lastname,
+            phone: user.phone,
+            addressNumber: user.addressNumber,
+            province: user.province,
+            district: user.district,
+            subDistrict: user.subDistrict,
+            postcode: user.postcode,
+            dateOfBirth: user.dateOfBirth,
         });
     } else {
         res.status(400);
@@ -50,39 +59,42 @@ const userSignup = asyncHandler(async (req, res) => {
     }
 });
 
-// @desc Authenticate a user
-// @route PUT /api/users/login
+// @desc User Signin
+// @route POST /api/users/login
 // @access Public
-const loginUser = asyncHandler(async (req, res) => {
+const userSignin = asyncHandler(async (req, res) => {
+    console.log("Login Trigget in backend");
     const { email, password } = req.body;
-    const user = await User.findOne({ email }); // ติดต่อกับ DB แล้ว
+    const user = await User.findOne({ email });
     if (user && (await bcrypt.compare(password, user.password))) {
         res.json({
             _id: user.id,
+            email: user.email,
+            citizen: user.citizen,
+            token: generateToken(user._id),
             firstname: user.firstname,
             lastname: user.lastname,
-            email: user.email,
             phone: user.phone,
-            citizen: user.citizen,
-            addressNo: user.addressNo,
+            addressNumber: user.addressNumber,
             province: user.province,
             district: user.district,
-            subdistrict: user.subdistrict,
+            subDistrict: user.subDistrict,
             postcode: user.postcode,
-            dob: user.dob,
-            token: generateToken(user._id),
+            dateOfBirth: user.dateOfBirth,
         });
     } else {
         res.status(400);
-        throw new Error("Invalid credentails");
+        throw new Error("Incorrect email address or password");
     }
 });
 
 // @desc Update a user details
-// @route POST /api/users/:id
+// @route PUT /api/users/
 // @access Private
-const updateUser = asyncHandler(async (req, res) => {
+const userUpdateInformation = asyncHandler(async (req, res) => {
+    console.log(req.body);
     const targetUser = await User.findById(req.params.id);
+    console.log(targetUser);
 
     if (!targetUser) {
         res.status(400);
@@ -97,11 +109,11 @@ const updateUser = asyncHandler(async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
     }).select("-password");
-    const updateUserAddedToken = {
-        ...updateUser,
-        token: generateToken(updateUser._id),
-    };
-    res.status(200).json(updateUserAddedToken);
+    console.log(updatedUser);
+    res.status(200).json({
+        ...updatedUser._doc,
+        token: generateToken(updatedUser._id),
+    });
 });
 
 // @desc Get user data
@@ -150,8 +162,8 @@ const generateToken = (id) => {
 
 module.exports = {
     userSignup,
-    loginUser,
-    updateUser,
+    userSignin,
+    userUpdateInformation,
     getUserDetails,
     // getMe,
     // updateUser,

@@ -35,11 +35,11 @@ export const adminSignin = createAsyncThunk(
 );
 
 // ---------- USER SECTION ----------
+
 // Register new user
 export const userSignup = createAsyncThunk(
     "auth/user/register",
     async (user, thunkAPI) => {
-        console.log(user);
         try {
             // try to register with service to backend
             return await authService.userSignup(user);
@@ -55,6 +55,52 @@ export const userSignup = createAsyncThunk(
     }
 );
 
+// Login user
+export const userSignin = createAsyncThunk(
+    "auth/user/signin",
+    async (user, thunkAPI) => {
+        try {
+            return await authService.userSignin(user);
+        } catch (error) {
+            const message =
+                (error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                error.message ||
+                error.toString();
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+);
+
+// Update user information
+export const userUpdateInformation = createAsyncThunk(
+    "auth/user/userUpdateInformation",
+    async (userData, thunkAPI) => {
+        try {
+            const token = thunkAPI.getState().auth.user.token;
+            return await authService.userUpdateInformation(
+                userData,
+                token,
+                thunkAPI
+            );
+        } catch (error) {
+            const message =
+                (error.response &&
+                    error.response.data &&
+                    error.response.data.message) ||
+                error.message ||
+                error.toString();
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+);
+
+// User Logout
+export const userLogout = createAsyncThunk("auth/user/userLogout", async () => {
+    await authService.userLogout();
+});
+
 // Create authSlice
 
 export const authSlice = createSlice({
@@ -67,6 +113,13 @@ export const authSlice = createSlice({
             state.isSuccess = false;
             state.isError = false;
             state.message = "";
+        },
+        resetLogout: (state) => {
+            state.isLoading = false;
+            state.isSuccess = false;
+            state.isError = false;
+            state.message = "";
+            state.user = null;
         },
     },
     extraReducers: (builder) => {
@@ -100,9 +153,37 @@ export const authSlice = createSlice({
                 state.isError = true;
                 state.message = action.payload;
                 state.user = null;
+            })
+            .addCase(userSignin.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(userSignin.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.isSuccess = true;
+                state.user = action.payload;
+            })
+            .addCase(userSignin.rejected, (state, action) => {
+                state.isLoading = false;
+                state.isError = true;
+                state.message = action.payload;
+                state.user = null;
+            })
+            .addCase(userUpdateInformation.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(userUpdateInformation.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.isSuccess = true;
+                console.log(action.payload);
+                state.user = action.payload;
+            })
+            .addCase(userUpdateInformation.rejected, (state, action) => {
+                state.isLoading = false;
+                state.isError = true;
+                state.message = action.payload;
             });
     },
 });
 
-export const { reset } = authSlice.actions;
+export const { reset, resetLogout } = authSlice.actions;
 export default authSlice.reducer;

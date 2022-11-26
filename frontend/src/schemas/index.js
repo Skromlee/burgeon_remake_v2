@@ -3,6 +3,9 @@ import * as yup from "yup";
 const passwordRules = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{5,}$/;
 // min 5 characters, 1 upper case letter, 1 lower case letter, 1 numeric digit.
 
+const phoneRegExp =
+    /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
+
 export const signInSchema = yup.object().shape({
     email: yup
         .string()
@@ -87,4 +90,67 @@ export const signUpSchema = yup.object().shape({
     acceptedTos: yup
         .boolean()
         .oneOf([true], "Please accept the terms of service"),
+});
+
+export const updateInformationSchema = yup.object().shape({
+    // firstname: "",
+    // lastname: "",
+    // phone: "",
+    // addressNumber: "",
+    // province: "",
+    // district: "",
+    // subDistrict: "",
+    // postcode: "",
+    // dateOfBirth: "",
+    email: yup
+        .string()
+        .email("Please enter a valid email")
+        .required("Required"),
+    citizen: yup
+        .number()
+        .required("Required")
+        .test(
+            "validNationalID",
+            (id) => "Licence ID Number must be valid",
+            (value) => {
+                let id = String(value);
+                if (id.length != 13) {
+                    return false;
+                }
+                let sum = 0;
+                // STEP 1 - get only first 12 digits
+                for (let i = 0; i < 12; i++) {
+                    // STEP 2 - multiply each digit with each index (reverse)
+                    // STEP 3 - sum multiply value together
+                    sum += parseInt(id.charAt(i)) * (13 - i);
+                }
+                // STEP 4 - mod sum with 11
+                let mod = sum % 11;
+                // STEP 5 - subtract 11 with mod, then mod 10 to get unit
+                let check = (11 - mod) % 10;
+                // STEP 6 - if check is match the digit 13th is correct
+                if (check == parseInt(id.charAt(12))) {
+                    // console.log("Valid ID");
+                    return true;
+                }
+                return false;
+            }
+        ),
+    firstname: yup.string().required("Required"),
+    lastname: yup.string().required("Required"),
+    phone: yup
+        .string()
+        .min(10, "Phone number must be valid")
+        .max(10, "Phone number must be valid")
+        .matches(phoneRegExp, "Phone number is not valid")
+        .required("Required"),
+    addressNumber: yup.string().required("Required"),
+    province: yup.string().required("Required"),
+    district: yup.string().required("Required"),
+    subDistrict: yup.string().required("Required"),
+    postcode: yup
+        .number()
+        .min(5, "Postcode must be valid")
+        .required("Required"),
+    dateOfBirth: yup.date().required("Required"),
 });

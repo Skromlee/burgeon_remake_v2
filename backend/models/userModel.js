@@ -24,7 +24,7 @@ const userSchema = mongoose.Schema(
             type: Number,
             unique: true,
         },
-        addressNo: {
+        addressNumber: {
             type: String,
         },
         province: {
@@ -33,13 +33,13 @@ const userSchema = mongoose.Schema(
         district: {
             type: String,
         },
-        subdistrict: {
+        subDistrict: {
             type: String,
         },
         postcode: {
             type: Number,
         },
-        dob: {
+        dateOfBirth: {
             type: Date,
         },
     },

@@ -2,8 +2,8 @@ const express = require("express");
 const router = express.Router();
 const {
     userSignup,
-    loginUser,
-    updateUser,
+    userSignin,
+    userUpdateInformation,
     getUserDetails,
     // getMe,
     // updateUser,
@@ -13,8 +13,8 @@ const { protect } = require("../middleware/authMiddleware");
 // Protect Middleware goes here
 
 router.post("/", userSignup);
-router.post("/login", loginUser);
-router.put("/:id", protect, updateUser);
+router.post("/login", userSignin);
+router.put("/:id", protect, userUpdateInformation);
 router.get("/", protect, getUserDetails);
 // router.get("/me", protect, getMe);
 // router.put("/:id", protect, updateUser);

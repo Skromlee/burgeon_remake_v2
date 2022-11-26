@@ -1,23 +1,46 @@
+// react-toastify
+import { toast } from "react-toastify";
+// formik
 import { useFormik } from "formik";
 import { signInSchema } from "../schemas";
 // icons from react-icons
 import { AiOutlineClose } from "react-icons/ai";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 // material ui
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 // userSlice
-import { reset } from "../features/auth/authSlice";
+import { reset, userSignin } from "../features/auth/authSlice";
+import { useEffect } from "react";
+import { Backdrop, CircularProgress } from "@mui/material";
 
 const Signup = () => {
     // Dispatch and Navigate
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const onSubmit = async (valuse, actions) => {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+    const { user, isLoading, isError, isSuccess, message } = useSelector(
+        (state) => state.auth
+    );
+
+    useEffect(() => {
+        if (isError) {
+            toast.error(message);
+        }
+
+        if (isSuccess || user) {
+            navigate("/user/home");
+        }
+
+        return () => {
+            dispatch(reset());
+        };
+    }, [user, isError, isSuccess, message, navigate, dispatch]);
+
+    const onSubmit = (values, actions) => {
         // Dispatch to userSignIn
+        dispatch(userSignin(values));
         actions.resetForm();
     };
 
@@ -29,6 +52,20 @@ const Signup = () => {
         validationSchema: signInSchema,
         onSubmit,
     });
+
+    if (isLoading) {
+        return (
+            <Backdrop
+                sx={{
+                    color: "#fff",
+                    zIndex: (theme) => theme.zIndex.drawer + 1,
+                }}
+                open={true}
+            >
+                <CircularProgress color="inherit" />
+            </Backdrop>
+        );
+    }
 
     return (
         <>
